@@ -39,6 +39,29 @@ if ($jk == "Laki-laki") {
 }
 
 echo "Email : " . $_GET['email'] . "<br>";
+
+// Menampilkan No HP
+echo "No HP : " . $_GET['no_hp'] . "<br>";
+
+// Menampilkan Umur
+echo "Umur : " . $_GET['umur'] . " tahun<br>";
+
+// Menampilkan Status
+$status = $_GET['status'] ?? '';
+if ($status === 'Kawin') {
+    echo "Status : Kawin<br>";
+} else {
+    echo "Status : Belum Kawin<br>";
+}
+
+// Menampilkan Hobi
+echo "Hobi : ";
+if (!empty($_GET['hobi'])) {
+    echo $_GET['hobi'];
+} else {
+    echo "Tidak ada hobi yang dipilih";
+}
+echo "<br>";
 ?>
 
 </body>

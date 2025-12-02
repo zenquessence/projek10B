@@ -25,21 +25,19 @@ Jenis Kelamin       :
 <input type="radio" name="jk" value="Laki-laki"> Laki-laki
 <input type="radio" name="jk" value="Perempuan"> Perempuan
 <br><br>
-Email               : <input type="email"name="email"><br><br>
-<input type="submit" value="Kirim">
-No HP               :
-<input type="text" name="no hp"><br><br>
-Umur                :
-<input type="number" name="umur"><br><br>
+Email               : <input type="email" name="email"><br><br>
+No HP               : <input type="text" name="no_hp"><br><br>
+Umur                : <input type="number" name="umur" min="0"><br><br>
 Status              :
-<input type="radio" name="jk" value="Kawin"> Kawin
-<input type="radio" name="jk" value="Belum Kawin"> Belum Kawin
+<input type="radio" name="status" value="Kawin"> Kawin
+<input type="radio" name="status" value="Belum Kawin"> Belum Kawin
 <br><br>
-Hobi                :
-<input type="checkbox", value="Membaca Buku"><br><br>
-<input type="checkbox", value="Olahraga"><br><br>
-<input type="checkbox", value="Musik"><br><br>
-<input type="checkbox", value="Traveling"><br><br>
+Hobi                :<br>
+<input type="checkbox" name="hobi[]" value="Membaca"> Membaca<br>
+<input type="checkbox" name="hobi[]" value="Olah Raga"> Olah Raga<br>
+<input type="checkbox" name="hobi[]" value="Musik"> Musik<br>
+<input type="checkbox" name="hobi[]" value="Traveling"> Traveling<br><br>
+<input type="submit" value="Kirim">
 </form>
 </body>
 </html>

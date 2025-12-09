@@ -1,72 +1,113 @@
 <?php
+// Memulai session untuk mendapatkan data form
+session_start();
 
-// Fungsi sanitasi
-function bersihkan($data) {
+// Memeriksa apakah data form ada dalam session
+if (!isset($_SESSION['formData'])) {
+    
+    header('Location: F_POST.php');
+    exit();
+}
+
+// Mengambil data dari session
+$formData = $_SESSION['formData'];
+
+// Menghapus data dari session setelah diambil
+unset($_SESSION['formData']);
+
+// Fungsi untuk menampilkan data dengan aman
+function safeDisplay($data) {
     return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
 }
-
-$nim            = bersihkan($_POST['nim']);
-$nama           = bersihkan($_POST['nama']);
-$umur           = bersihkan($_POST['umur']);
-$tempat_lahir   = bersihkan($_POST['tempat_lahir']);
-$tanggal_lahir  = bersihkan($_POST['tanggal_lahir']);
-$no_hp          = bersihkan($_POST['no_hp']);
-$alamat         = bersihkan($_POST['alamat']);
-$email          = bersihkan($_POST['email']);
-
-// Sanitasi kota
-$kota = bersihkan($_POST['kota']);
-
-// Sanitasi jenis kelamin (radio)
-$jk = isset($_POST['jk']) ? bersihkan($_POST['jk']) : "-";
-
-// Sanitasi status kawin
-$status = isset($_POST['status']) ? bersihkan($_POST['status']) : "-";
-
-// Sanitasi checkbox hobi
-$hobi_list = [];
-if (!empty($_POST['hobi'])) {
-    foreach ($_POST['hobi'] as $h) {
-        $hobi_list[] = bersihkan($h);
-    }
-}
-
-$hobi_output = implode(", ", $hobi_list);
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Hasil Data POST</title>
+    <title>Hasil Input POST</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; }
+        .data-container { margin-bottom: 15px; }
+        .data-label { font-weight: bold; display: inline-block; width: 150px; }
+        .data-value { display: inline-block; }
+        h2 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+    </style>
 </head>
 <body>
 
-<h2>Hasil Input Data Mahasiswa (Metode POST)</h2>
+<h2>Data yang Dikirim dengan Metode POST</h2>
 
-<p><b>NIM:</b> <?= $nim ?></p>
-<p><b>Nama:</b> <?= $nama ?></p>
-<p><b>Umur:</b> <?= $umur ?></p>
-<p><b>Tempat Lahir:</b> <?= $tempat_lahir ?></p>
-<p><b>Tanggal Lahir:</b> <?= $tanggal_lahir ?></p>
-<p><b>No HP:</b> <?= $no_hp ?></p>
-<p><b>Alamat:</b> <?= $alamat ?></p>
+<div class="data-container">
+    <span class="data-label">NIM:</span>
+    <span class="data-value"><?php echo safeDisplay($formData['nim']); ?></span>
+</div>
 
-<p><b>Kota:</b>
-<?php
-    if ($kota == "Semarang") echo "Semarang";
-    elseif ($kota == "Solo") echo "Solo";
-    elseif ($kota == "Brebes") echo "Brebes";
-    elseif ($kota == "Kudus") echo "Kudus";
-    elseif ($kota == "Demak") echo "Demak";
-    else echo "Salatiga";
-?>
+<div class="data-container">
+    <span class="data-label">Nama:</span>
+    <span class="data-value"><?php echo safeDisplay($formData['nama']); ?></span>
+</div>
+
+<div class="data-container">
+    <span class="data-label">Tempat Lahir:</span>
+    <span class="data-value"><?php echo safeDisplay($formData['tempat_lahir']); ?></span>
+</div>
+
+<div class="data-container">
+    <span class="data-label">Tanggal Lahir:</span>
+    <span class="data-value"><?php echo !empty($formData['tanggal_lahir']) ? safeDisplay($formData['tanggal_lahir']) : '-'; ?></span>
+</div>
+
+<div class="data-container">
+    <span class="data-label">Alamat:</span>
+    <span class="data-value"><?php echo nl2br(safeDisplay($formData['alamat'])); ?></span>
+</div>
+
+<div class="data-container">
+    <span class="data-label">Kota:</span>
+    <span class="data-value"><?php echo safeDisplay($formData['kota']); ?></span>
+</div>
+
+<div class="data-container">
+    <span class="data-label">Jenis Kelamin:</span>
+    <span class="data-value"><?php echo !empty($formData['jk']) ? safeDisplay($formData['jk']) : '-'; ?></span>
+</div>
+
+<div class="data-container">
+    <span class="data-label">Email:</span>
+    <span class="data-value"><?php echo !empty($formData['email']) ? safeDisplay($formData['email']) : '-'; ?></span>
+</div>
+
+<div class="data-container">
+    <span class="data-label">No HP:</span>
+    <span class="data-value"><?php echo !empty($formData['no_hp']) ? safeDisplay($formData['no_hp']) : '-'; ?></span>
+</div>
+
+<div class="data-container">
+    <span class="data-label">Umur:</span>
+    <span class="data-value"><?php echo !empty($formData['umur']) ? safeDisplay($formData['umur']) . ' tahun' : '-'; ?></span>
+</div>
+
+<div class="data-container">
+    <span class="data-label">Status:</span>
+    <span class="data-value"><?php echo !empty($formData['status']) ? safeDisplay($formData['status']) : '-'; ?></span>
+</div>
+
+<div class="data-container">
+    <span class="data-label">Hobi:</span>
+    <span class="data-value">
+        <?php 
+        if (!empty($formData['hobi']) && is_array($formData['hobi'])) {
+            echo implode(', ', array_map('safeDisplay', $formData['hobi']));
+        } else {
+            echo '-';
+        }
+        ?>
+    </span>
+</div>
+
+<p style="margin-top: 30px;">
+    <a href="F_POST.php">Kembali ke Form</a>
 </p>
-
-<p><b>Jenis Kelamin:</b> <?= $jk ?></p>
-<p><b>Status:</b> <?= $status ?></p>
-<p><b>Hobi:</b> <?= $hobi_output ?></p>
-<p><b>Email:</b> <?= $email ?></p>
 
 </body>
 </html>

@@ -1,17 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Form Data (POST)</title>
-    <style>
-        .error { color: red; }
-        .form-group { margin-bottom: 15px; }
-        label { display: inline-block; width: 120px; }
-    </style>
-</head>
-<body>
-
-<h2>Form Input Data Mahasiswa - POST</h2>
 <?php
+// Start session at the very beginning
+session_start();
 
 $errors = [];
 $formData = [
@@ -29,9 +18,7 @@ $formData = [
     'hobi' => []
 ];
 
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-   
     $formData['nim'] = trim($_POST['nim'] ?? '');
     $formData['nama'] = trim($_POST['nama'] ?? '');
     $formData['tempat_lahir'] = trim($_POST['tempat_lahir'] ?? '');
@@ -55,6 +42,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validasi Nama
     if (empty($formData['nama'])) {
         $errors['nama'] = 'Nama tidak boleh kosong';
+    } elseif (preg_match('/\d/', $formData['nama'])) {
+        $errors['nama'] = 'Nama tidak boleh mengandung angka';
     }
 
     // Validasi Tempat Lahir
@@ -71,16 +60,201 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $errors['umur'] = 'Umur harus antara 0-999';
     }
 
-    
     if (empty($errors)) {
-        
-        session_start();
         $_SESSION['formData'] = $formData;
         header('Location: proses_post.php');
         exit();
     }
 }
 ?>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Data Mahasiswa (POST)</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --error-color: #e74c3c;
+            --success-color: #2ecc71;
+            --border-color: #ddd;
+            --text-color: #333;
+            --bg-color: #f9f9f9;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        h2 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        label {
+            width: 150px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="date"],
+        input[type="number"],
+        input[type="tel"],
+        select,
+        textarea {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        }
+        
+        .radio-group, .checkbox-group {
+            flex: 1;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .radio-option, .checkbox-option {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+        
+        .radio-option input, .checkbox-option input {
+            width: auto;
+            margin-right: 5px;
+        }
+        
+        .radio-option label, .checkbox-option label {
+            width: auto;
+            font-weight: normal;
+        }
+        
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.85em;
+            margin-top: 5px;
+            width: 100%;
+            padding-left: 165px;
+        }
+        
+        .error {
+            background-color: #fde8e8;
+            border-left: 4px solid var(--error-color);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .error h3 {
+            margin-top: 0;
+            color: var(--error-color);
+        }
+        
+        .error ul {
+            margin-bottom: 0;
+            padding-left: 20px;
+        }
+        
+        button[type="submit"] {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+        
+        button[type="submit"]:hover {
+            background-color: #2980b9;
+        }
+        
+        .button-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            
+            input[type="text"],
+            input[type="email"],
+            input[type="date"],
+            input[type="number"],
+            input[type="tel"],
+            select,
+            textarea {
+                width: 100%;
+            }
+            
+            .error-message {
+                padding-left: 0;
+            }
+            
+            .button-container {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<h2>Form Input Data Mahasiswa - POST</h2>
 
 <?php if (!empty($errors)): ?>
     <div class="error">
@@ -93,11 +267,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 <?php endif; ?>
 
-<form action="F_POST.php" method="POST" novalidate>
+<form id="mahasiswaForm" action="F_POST.php" method="POST" novalidate onsubmit="return validateForm()">
     <div class="form-group">
-        <label for="nim">NIM:</label>
+        <label for="nim">NIM <span class="required">*</span>:</label>
         <input type="text" id="nim" name="nim" 
                value="<?php echo htmlspecialchars($formData['nim']); ?>"
+               pattern="[A-Z]\d{2}\.\d{4}\.\d{5}"
+               title="Format NIM: A12.2024.07263"
                placeholder="A11.1111.11111"
                pattern="[A-Za-z]\d{2}\.\d{4}\.\d{5}" 
                title="Contoh: A11.1111.11111 (1 huruf, 2 angka, titik, 4 angka, titik, 5 angka)"
@@ -124,9 +300,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
     <div class="form-group">
-        <label for="nama">Nama:</label>
+        <label for="nama">Nama <span class="required">*</span>:</label>
         <input type="text" id="nama" name="nama" 
-               value="<?php echo htmlspecialchars($formData['nama']); ?>">
+               value="<?php echo htmlspecialchars($formData['nama']); ?>"
+               oninput="validateName(this)">
         <?php if (isset($errors['nama'])): ?>
             <span class="error"><?php echo htmlspecialchars($errors['nama']); ?></span>
         <?php endif; ?>
@@ -189,9 +366,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
     <div class="form-group">
-        <label for="umur">Umur:</label>
-        <input type="number" id="umur" name="umur" min="0" max="999"
-               value="<?php echo htmlspecialchars($formData['umur']); ?>">
+        <label for="umur">Umur <span class="required">*</span>:</label>
+        <input type="number" id="umur" name="umur" 
+               min="1" max="999"
+               value="<?php echo htmlspecialchars($formData['umur']); ?>"
+               oninput="validateAge(this)">
         <?php if (isset($errors['umur'])): ?>
             <span class="error"><?php echo htmlspecialchars($errors['umur']); ?></span>
         <?php endif; ?>
@@ -231,6 +410,107 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <input type="submit" value="Kirim">
     </div>
 </form>
+
+<script>
+    // Validasi form sebelum submit
+    function validateForm() {
+        let isValid = true;
+        const form = document.getElementById('mahasiswaForm');
+        
+        // Validasi Nama
+        const nama = document.getElementById('nama');
+        if (!validateName(nama)) {
+            isValid = false;
+        }
+        
+        // Validasi Umur
+        const umur = document.getElementById('umur');
+        if (!validateAge(umur)) {
+            isValid = false;
+        }
+        
+        return isValid;
+    }
+    
+    // Validasi Nama (hanya huruf dan spasi)
+    function validateName(input) {
+        const value = input.value.trim();
+        const errorElement = document.getElementById('namaError') || createErrorElement(input, 'namaError');
+        
+        if (value === '') {
+            showError(input, errorElement, 'Nama tidak boleh kosong');
+            return false;
+        } else if (/\d/.test(value)) {
+            showError(input, errorElement, 'Nama tidak boleh mengandung angka');
+            return false;
+        } else if (!/^[a-zA-Z\s]*$/.test(value)) {
+            showError(input, errorElement, 'Nama hanya boleh berisi huruf dan spasi');
+            return false;
+        } else {
+            removeError(input, errorElement);
+            return true;
+        }
+    }
+    
+    // Validasi Umur (hanya angka)
+    function validateAge(input) {
+        const value = input.value.trim();
+        const errorElement = document.getElementById('umurError') || createErrorElement(input, 'umurError');
+        
+        if (value === '') {
+            showError(input, errorElement, 'Umur tidak boleh kosong');
+            return false;
+        } else if (isNaN(value)) {
+            showError(input, errorElement, 'Umur harus berupa angka');
+            return false;
+        } else if (value < 1 || value > 999) {
+            showError(input, errorElement, 'Umur harus antara 1-999');
+            return false;
+        } else {
+            removeError(input, errorElement);
+            return true;
+        }
+    }
+    
+    // Fungsi bantuan untuk menampilkan pesan error
+    function showError(input, errorElement, message) {
+        input.style.borderColor = '#e74c3c';
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+    }
+    
+    // Fungsi bantuan untuk menghapus pesan error
+    function removeError(input, errorElement) {
+        input.style.borderColor = '';
+        errorElement.style.display = 'none';
+    }
+    
+    // Fungsi untuk membuat elemen error jika belum ada
+    function createErrorElement(input, id) {
+        const errorElement = document.createElement('div');
+        errorElement.id = id;
+        errorElement.className = 'error-message';
+        errorElement.style.display = 'none';
+        input.parentNode.insertBefore(errorElement, input.nextSibling);
+        return errorElement;
+    }
+    
+    // Inisialisasi error elements untuk validasi server-side
+    document.addEventListener('DOMContentLoaded', function() {
+        const nama = document.getElementById('nama');
+        const umur = document.getElementById('umur');
+        
+        if (nama) {
+            createErrorElement(nama, 'namaError');
+            nama.addEventListener('blur', function() { validateName(this); });
+        }
+        
+        if (umur) {
+            createErrorElement(umur, 'umurError');
+            umur.addEventListener('blur', function() { validateAge(this); });
+        }
+    });
+</script>
 
 </body>
 </html>
